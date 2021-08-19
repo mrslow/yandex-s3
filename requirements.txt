@@ -1,0 +1,4 @@
+aiofiles
+cryptography
+httpx
+pydantic

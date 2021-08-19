@@ -1,0 +1,47 @@
+# Generic files to ignore
+*~
+*.lock
+*.html
+*.DS_Store
+*.swp
+*.out
+*.old
+*.jpg
+*.zip
+*.xml
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+.installed.cfg
+develop-eggs/
+config/*.yaml
+config/*.py
+test.py
+.Python
+.venv/
+venv/
+logs/
+files/
+bin/
+build/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+crypto/
+idea/
+.idea/
+*.egg-info/
+*.egg
+.coverage
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
