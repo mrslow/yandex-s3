@@ -29,7 +29,7 @@ pip install yandex-s3
 ```py
 import asyncio
 # requires `pip install yandex-s3`
-from yandex_s3 import S3Client
+from s3 import S3Client
 
 # requires `pip install devtools`
 from devtools import debug
@@ -39,11 +39,11 @@ async def s3_demo():
             access_key='<access key>', 
             secret_key='<secret key>', 
             region='<region>', 
-            s3_bucket='my_bucket_name.com'
+            s3_bucket='test-bucket'
     )
 
     # upload a file:
-    await s3.upload('path/to/upload-to.txt', b'this the content')
+    await s3.upload('dir/subdir/dummy.txt', b'Dummy')
 
     # list all files in a bucket
     files = [f async for f in s3.list()]
@@ -51,56 +51,57 @@ async def s3_demo():
     """
     [
         S3File(
-            key='path/to/upload-to.txt',
+            key='dir/subdir/dummy.txt',
             last_modified=datetime.datetime(...),
-            size=16,
+            size=5,
             e_tag='...',
             storage_class='STANDARD',
         ),
-    ]
+    ] (list) len=1
     """
     # list all files with a given prefix in a bucket
-    files = [f async for f in s3.list('path/to/')]
+    files = [f async for f in s3.list('dir/subdir/')]
     debug(files)
 
     # # delete a file
-    # await s3.delete('path/to/file.txt')
+    # await s3.delete('dir/subdir/dummy.txt')
     # # delete two files
-    # await s3.delete('path/to/file1.txt', 'path/to/file2.txt')
+    # await s3.delete('dir/subdir/file1.txt', 'dir/subdir/file2.txt')
     # delete recursively based on a prefix
-    await s3.delete_recursive('path/to/')
+    await s3.delete_recursive('dir/subdir')
 
     # generate an upload link suitable for sending to a borwser to enabled
     # secure direct file upload (see below)
     upload_data = s3.signed_upload_url(
-        path='path/to/',
-        filename='demo.png',
-        content_type='image/png',
+        path='dir/subdir',
+        filename='dummy.txt',
+        content_type='text/plain',
         size=123,
     )
     debug(upload_data)
     """
     {
-        'url': 'https://my_bucket_name.com/',
+        'url': 'https://test-bucket.storage.yandexcloud.net/',
         'fields': {
-            'Key': 'path/to/demo.png',
-            'Content-Type': 'image/png',
-            'AWSAccessKeyId': '<access key>',
-            'Content-Disposition': 'attachment; filename="demo.png"',
-            'Policy': '...',
+            'Key': 'dir/subdir/dummy.txt',
+            'Content-Type': 'text/plain',
+            'AWSAccessKeyId': '...',
+            'Content-Disposition': 'attachment; filename="dummy.txt"',
+            'Policy': ('...'),
             'Signature': '...',
         },
-    }
+    } (dict) len=2
     """
 
     # generate a temporary link to allow yourself or a client to download a file
-    download_url = s3.signed_download_url('path/to/demo.png', max_age=60)
+    download_url = s3.signed_download_url('dir/subdir/dummy.txt', max_age=60)
     print(download_url)
-    #> https://my_bucket_name.com/path/to/demo.png?....
+    #> https://test-bucket.storage.yandexcloud.net/dir/subdir/dummy.txt?AWSAccessKeyId=...&Signature=...&Expires=...
     
     # download file
-    content = await s3.download('path/to/demo.png')
+    content = await s3.download('dir/subdir/dummy.txt')
     print(content)
+    #> b'Dummy'
     
 
 async def main():

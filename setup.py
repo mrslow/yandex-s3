@@ -11,7 +11,7 @@ ext_modules = None
 
 setup(
     name='yandex-s3',
-    version='0.1',
+    version='0.1.1',
     description=description,
     long_description=long_description,
     long_description_content_type='text/markdown',
