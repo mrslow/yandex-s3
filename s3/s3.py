@@ -16,7 +16,7 @@ from typing import (
     Optional,
     Union
 )
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from xml.etree import ElementTree
 
 from pydantic import BaseModel, validator
@@ -212,9 +212,10 @@ class S3Client:
         https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html#RESTAuthenticationQueryStringAuth
         """
         assert not path.startswith('/'), 'path should not start with /'
+        quoted_path = quote(path)
         min_expires = to_unix_s(utcnow()) + max_age
         expires = int(ceil(min_expires / expiry_rounding) * expiry_rounding)
-        to_sign = f'GET\n\n\n{expires}\n/{self._config.s3_bucket}/{path}'
+        to_sign = f'GET\n\n\n{expires}\n/{self._config.s3_bucket}/{quoted_path}'
         signature = self._signature(to_sign.encode())
         args = {
             'AWSAccessKeyId': self._config.access_key,
@@ -223,7 +224,7 @@ class S3Client:
         }
         if version:
             args['v'] = version
-        return f'https://{self._client.host}/{path}?{urlencode(args)}'
+        return f'https://{self._client.host}/{quoted_path}?{urlencode(args)}'
 
     def signed_upload_url(
         self,
